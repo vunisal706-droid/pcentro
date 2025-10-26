@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Centro - CEIP Capitulaciones</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="description" content="Visualizador del Plan de Centro del CEIP Capitulaciones - Santa Fe">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .brand-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            font-size: 1.2rem;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 320px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        /* DOCUMENT CARDS */
+        .document-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .document-card {
+            background: linear-gradient(135deg, var(--surface) 0%, #fafafa 100%);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .document-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--doc-color, var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        .document-card:hover::before {
+            width: 8px;
+        }
+
+        .document-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-color: var(--doc-color, var(--primary));
+        }
+
+        .document-card.active {
+            border-color: var(--doc-color, var(--primary));
+            background: linear-gradient(135deg, var(--surface) 0%, rgba(37, 99, 235, 0.05) 100%);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+        }
+
+        .document-card.active::before {
+            width: 8px;
+        }
+
+        .doc-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .doc-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--doc-color, var(--primary)) 0%, var(--doc-color-dark, var(--primary-dark)) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .doc-info {
+            flex: 1;
+        }
+
+        .doc-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.2rem;
+        }
+
+        .doc-meta {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .doc-badge {
+            display: inline-block;
+            background: var(--doc-color, var(--primary));
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* INDEX LIST */
+        .index-list {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border);
+        }
+
+        .index-list.active {
+            display: block;
+        }
+
+        .index-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .index-item:hover {
+            background: white;
+            border-left-color: var(--doc-color, var(--primary));
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .index-item.active {
+            background: white;
+            border-left-color: var(--doc-color, var(--primary));
+            font-weight: 600;
+            color: var(--doc-color, var(--primary));
+        }
+
+        /* PDF VIEWER */
+        .pdf-viewer {
+            flex: 1;
+            background: #525659;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .pdf-controls {
+            background: #323639;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid #1a1c1e;
+        }
+
+        .pdf-controls button {
+            background: #3e4245;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .pdf-controls button:hover {
+            background: #4a4e51;
+        }
+
+        .pdf-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .pdf-container {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .pdf-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem;
+            color: white;
+        }
+
+        .welcome-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        /* MOBILE STYLES */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 0;
+                height: 100vh;
+                z-index: 200;
+                box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+            }
+
+            .sidebar.open {
+                transform: translateX(320px);
+            }
+
+            .brand-text p {
+                display: none;
+            }
+
+            .btn span:not(.btn-icon) {
+                display: none;
+            }
+
+            .pdf-container {
+                padding: 0.5rem;
+            }
+        }
+
+        /* OVERLAY */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 150;
+            backdrop-filter: blur(2px);
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* INSTALL PROMPT */
+        .install-prompt {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 300;
+            max-width: 350px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .install-prompt.active {
+            display: block;
+        }
+
+        .install-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .install-icon {
+            font-size: 2rem;
+        }
+
+        .install-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .install-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .install-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .install-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .install-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .install-btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .install-btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .install-btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="brand-icon">🏫</div>
+                    <div class="brand-text">
+                        <h1>Plan de Centro</h1>
+                        <p>CEIP Capitulaciones - Santa Fe</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn" id="menuBtn">
+                        <span class="btn-icon">☰</span>
+                        <span>Menú</span>
+                    </button>
+                    <button class="btn" id="downloadBtn">
+                        <span class="btn-icon">⬇️</span>
+                        <span>Descargar PDFs</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- SIDEBAR -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">📚 Documentos del Centro</div>
+                    <div class="sidebar-subtitle">Selecciona un documento para navegar</div>
+                </div>
+                <div class="sidebar-content">
+                    <div class="document-grid" id="documentGrid">
+                        <!-- Los documentos se cargan aquí dinámicamente -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- PDF VIEWER -->
+            <main class="pdf-viewer">
+                <div class="pdf-controls" id="pdfControls" style="display: none;">
+                    <button id="prevPage">◀ Anterior</button>
+                    <span class="page-info" id="pageInfo">Página 1 de 1</span>
+                    <button id="nextPage">Siguiente ▶</button>
+                    <button id="zoomOut">🔍-</button>
+                    <button id="zoomIn">🔍+</button>
+                </div>
+                <div class="pdf-container" id="pdfContainer">
+                    <div class="welcome-screen">
+                        <div class="welcome-icon">📄</div>
+                        <h2 class="welcome-title">Visualizador de Plan de Centro</h2>
+                        <p class="welcome-text">
+                            Selecciona un documento del menú lateral para comenzar.<br>
+                            Navega fácilmente por los índices y salta directamente<br>
+                            a las secciones que necesites consultar.
+                        </p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- INSTALL PROMPT -->
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-header">
+            <span class="install-icon">📱</span>
+            <span class="install-title">Instalar aplicación</span>
+        </div>
+        <p class="install-text">
+            Instala esta aplicación en tu dispositivo para acceder más rápido y trabajar sin conexión.
+        </p>
+        <div class="install-actions">
+            <button class="install-btn install-btn-primary" id="installBtn">Instalar</button>
+            <button class="install-btn install-btn-secondary" id="dismissBtn">Ahora no</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de documentos
+        const documents = [
+            {
+                id: 'proyecto',
+                title: 'Proyecto Educativo',
+                file: 'pe.pdf',
+                page: 3,
+                icon: '📘',
+                color: '#2563eb',
+                colorDark: '#1e40af',
+                sections: [
+                    { id: 'A', title: 'A. Objetivos propios', page: 5 },
+                    { id: 'B', title: 'B. Líneas de actuación pedagógica', page: 7 },
+                    { id: 'C', title: 'C. Contenidos curriculares', page: 9 },
+                    { id: 'D', title: 'D. Criterios pedagógicos horarios', page: 16 },
+                    { id: 'E', title: 'E. Evaluación y promoción', page: 16 },
+                    { id: 'F', title: 'F. Atención a la diversidad', page: 23 },
+                    { id: 'G', title: 'G. Refuerzo y recuperación', page: 24 },
+                    { id: 'H', title: 'H. Orientación y acción tutorial', page: 76 },
+                    { id: 'I', title: 'I. Compromisos educativos', page: 78 },
+                    { id: 'J', title: 'J. Plan de convivencia', page: 84 },
+                    { id: 'K', title: 'K. Formación del profesorado', page: 84 },
+                    { id: 'L', title: 'L. Organización tiempo escolar', page: 88 },
+                    { id: 'M', title: 'M. Evaluación interna', page: 98 },
+                    { id: 'N', title: 'N. Agrupamientos y tutorías', page: 101 },
+                    { id: 'Ñ', title: 'Ñ. Programaciones didácticas', page: 105 },
+                    { id: 'O', title: 'O. Planes estratégicos', page: 108 }
+                ]
+            },
+            {
+                id: 'rof',
+                title: 'Reglamento de Organización',
+                file: 'rof.pdf',
+                page: 231,
+                icon: '⚖️',
+                color: '#8b5cf6',
+                colorDark: '#7c3aed',
+                sections: [
+                    { id: 'A', title: 'A. Cauces de participación', page: 233 },
+                    { id: 'B', title: 'B. Criterios de transparencia', page: 256 },
+                    { id: 'C', title: 'C. Organización espacios', page: 257 },
+                    { id: 'D', title: 'D. Vigilancia recreos', page: 264 },
+                    { id: 'E', title: 'E. Gestión libros de texto', page: 267 },
+                    { id: 'F', title: 'F. Plan de autoprotección', page: 270 },
+                    { id: 'G', title: 'G. Equipos de evaluación', page: 279 },
+                    { id: 'H', title: 'H. Uso móviles e internet', page: 280 },
+                    { id: 'I', title: 'I. Uniforme del alumnado', page: 283 },
+                    { id: 'J', title: 'J. Prevención riesgos', page: 283 }
+                ]
+            },
+            {
+                id: 'gestion',
+                title: 'Proyecto de Gestión',
+                file: 'prgestion.pdf',
+                page: 286,
+                icon: '💼',
+                color: '#f97316',
+                colorDark: '#ea580c',
+                sections: [
+                    { id: 'A', title: 'A. Presupuesto anual', page: 288 },
+                    { id: 'B', title: 'B. Gestión sustituciones', page: 290 },
+                    { id: 'C', title: 'C. Conservación instalaciones', page: 291 },
+                    { id: 'D', title: 'D. Obtención de ingresos', page: 291 },
+                    { id: 'E', title: 'E. Inventario general', page: 291 },
+                    { id: 'F', title: 'F. Gestión sostenible', page: 296 }
+                ]
+            }
+        ];
+
+        let currentDoc = null;
+        let currentPage = 1;
+
+        // Elementos del DOM
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuBtn = document.getElementById('menuBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const documentGrid = document.getElementById('documentGrid');
+        const pdfContainer = document.getElementById('pdfContainer');
+        const pdfControls = document.getElementById('pdfControls');
+
+        // Renderizar documentos
+        function renderDocuments() {
+            documentGrid.innerHTML = documents.map(doc => `
+                <div class="document-card" data-doc="${doc.id}" style="--doc-color: ${doc.color}; --doc-color-dark: ${doc.colorDark}">
+                    <div class="doc-header">
+                        <div class="doc-icon" style="background: linear-gradient(135deg, ${doc.color} 0%, ${doc.colorDark} 100%)">
+                            ${doc.icon}
+                        </div>
+                        <div class="doc-info">
+                            <div class="doc-title">${doc.title}</div>
+                            <div class="doc-meta">
+                                Página ${doc.page}
+                                <span class="doc-badge">${doc.sections.length} secciones</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="index-list" id="index-${doc.id}">
+                        ${doc.sections.map(section => `
+                            <div class="index-item" data-doc="${doc.id}" data-page="${section.page}" style="--doc-color: ${doc.color}">
+                                ${section.title}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Event listeners para documentos
+            document.querySelectorAll('.document-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('index-item')) {
+                        toggleDocument(card.dataset.doc);
+                    }
+                });
+            });
+
+            // Event listeners para índices
+            document.querySelectorAll('.index-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    loadPDF(item.dataset.doc, parseInt(item.dataset.page));
+                    
+                    // Marcar como activo
+                    document.querySelectorAll('.index-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Cerrar sidebar en móvil
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        overlay.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        // Toggle documento
+        function toggleDocument(docId) {
+            const card = document.querySelector(`[data-doc="${docId}"]`);
+            const indexList = document.getElementById(`index-${docId}`);
+            const wasActive = card.classList.contains('active');
+
+            // Cerrar todos
+            document.querySelectorAll('.document-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.index-list').forEach(l => l.classList.remove('active'));
+
+            // Abrir el seleccionado si no estaba activo
+            if (!wasActive) {
+                card.classList.add('active');
+                indexList.classList.add('active');
+                currentDoc = documents.find(d => d.id === docId);
+                loadPDF(docId, currentDoc.page);
+            }
+        }
+
+        // Cargar PDF
+        function loadPDF(docId, page = 1) {
+            const doc = documents.find(d => d.id === docId);
+            if (!doc) return;
+
+            currentDoc = doc;
+            currentPage = page;
+
+            pdfContainer.innerHTML = `
+                <iframe 
+                    class="pdf-frame" 
+                    src="${doc.file}#page=${page}&view=FitH" 
+                    type="application/pdf"
+                >
+                    Tu navegador no soporta PDFs. 
+                    <a href="${doc.file}" target="_blank">Descargar PDF</a>
+                </iframe>
+            `;
+
+            pdfControls.style.display = 'flex';
+        }
+
+        // Menú móvil
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        // Descargar PDFs
+        downloadBtn.addEventListener('click', () => {
+            const downloads = documents.map(doc => 
+                `<a href="${doc.file}" download="${doc.file}">${doc.title}</a>`
+            ).join('<br>');
+            
+            if (confirm('¿Descargar todos los PDFs del Plan de Centro?')) {
+                documents.forEach(doc => {
+                    const link = document.createElement('a');
+                    link.href = doc.file;
+                    link.download = doc.file;
+                    link.click();
+                });
+            }
+        });
+
+        // PWA Install
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+        const dismissBtn = document.getElementById('dismissBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.classList.add('active');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            installPrompt.classList.remove('active');
+        });
+
+        dismissBtn.addEventListener('click', () => {
+            installPrompt.classList.remove('active');
+        });
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('✅ Service Worker registrado'))
+                .catch(err => console.log('❌ Error SW:', err));
+        }
+
+        // Inicializar
+        renderDocuments();
+    </script>
+</body>
+</html>
